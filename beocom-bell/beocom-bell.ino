@@ -6,7 +6,6 @@ unsigned long endMicros;
 
 const int LED = LED_BUILTIN;
 const int TEST_RINGER_BUTTON = 4;   // D4
-const long DURATION = 1000;         // Ring duration
 const int RELAY_PIN = 7;            // D7
 const int RF_PIN = 2;               // Pin D2 = interrupt 0
 const int HZ = 25;
@@ -23,11 +22,11 @@ void setup() {
 	pinMode(RELAY_PIN, OUTPUT);
 
 	digitalWrite(7, HIGH);
-  Serial.println("System Ready");
+	Serial.println("System Ready");
 }
 
 void loop() {
-  buttonState = digitalRead(TEST_RINGER_BUTTON);
+	buttonState = digitalRead(TEST_RINGER_BUTTON);
 
 	if (mySwitch.available() &&
 	    mySwitch.getReceivedBitlength() == 24 || buttonState == HIGH) {
@@ -43,28 +42,30 @@ void busyLED(byte state) {
 /*
   Ring voltage approv 50V @ 25HZ for 2 seconds.
   1000 miliseconds / 25(hz) = 20ms high and 20ms low @ 50% duty cycle
+
+  HARDCODED FOR 25HZ OVER 2 SECONDS
 */
 void generateRingtone() {
-  int count = 0;
+	int count = 0;
 	busyLED(HIGH);
 
-  Serial.println("Ringing");
-  startTime = millis();
-  for (int i = 0; i < HZ * 2; i++ ) {
-	  digitalWrite(RELAY_PIN, LOW);
-	  delay(20);			// Doorbell is ringing
-	  digitalWrite(7, HIGH);
-	  delay(20);			// Doorbell is ringing
-    count++;
-  }
-  endMicros = millis();
+	Serial.println("Ringing");
+	startTime = millis();
+	for (int i = 0; i < HZ * 2; i++ ) {
+		digitalWrite(RELAY_PIN, LOW);
+		delay(20);			// Doorbell is ringing
+		digitalWrite(7, HIGH);
+		delay(20);			// Doorbell is ringing
+	count++;
+	}
+	endMicros = millis();
 	busyLED(LOW);
 
-  Serial.print("Ring duration: ");
-  Serial.print( (endMicros - startTime) / 1000 );
-  Serial.print(" seconds    |    Times cycled: ");
-  Serial.println(count);
-  
-  // Cool down
-  delay(DURATION * 2);
+	Serial.print("Ring duration: ");
+	Serial.print( (endMicros - startTime) / 1000 );
+	Serial.print(" seconds    |    Times cycled: ");
+	Serial.println(count);
+
+	// Cool down
+	delay(DURATION * 2);
 }
